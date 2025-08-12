@@ -29,13 +29,13 @@ SafeRoute API bridges that gap by integrating real-time location lookups, mappin
 - **Scalable Architecture** – Separation of concerns with multiple apps.
 - **API Documentation** – DRF browsable API & Postman Collection.
 
----
 saferoute/
 ├── saferoute/           # Main project settings
 ├── users/               # Handles user authentication & profiles
 ├── services/            # External API integrations
 ├── routes/              # Core routing logic & feedback
 └── manage.py
+
 
 ---
 
@@ -170,4 +170,4 @@ MIT License
 ---
 
 ## 👤 Author
-Your Name — [LinkedIn](https://www.linkedin.com/in/rich-mwendwa-b3296a302/) | [GitHub](https://github.com/RichBen03)
+Rich Benjamin — [LinkedIn](https://www.linkedin.com/in/rich-mwendwa-b3296a302/) | [GitHub](https://github.com/RichBen03)
