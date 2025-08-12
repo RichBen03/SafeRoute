@@ -1,9 +1,3 @@
-saferoute/
-├── saferoute/           # Main project settings
-├── users/               # Handles user authentication & profiles
-├── services/            # External API integrations
-├── routes/              # Core routing logic & feedback
-└── manage.py
 # 🛡️ SafeRoute API
 
 SafeRoute API is a Django REST Framework backend service that helps users find **safe routes** and **critical emergency services** (hospitals, police stations, fire stations) based on their location.  
@@ -34,6 +28,14 @@ SafeRoute API bridges that gap by integrating real-time location lookups, mappin
 - **Pagination & Filtering** – Efficient API data handling.
 - **Scalable Architecture** – Separation of concerns with multiple apps.
 - **API Documentation** – DRF browsable API & Postman Collection.
+
+---
+saferoute/
+├── saferoute/           # Main project settings
+├── users/               # Handles user authentication & profiles
+├── services/            # External API integrations
+├── routes/              # Core routing logic & feedback
+└── manage.py
 
 ---
 
