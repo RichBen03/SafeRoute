@@ -1,0 +1,53 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Environment variables
+.env
+*.env
+
+# SQLite database (optional if you don't want to commit data)
+db.sqlite3
+
+# Django stuff
+media/
+staticfiles/
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE/project settings
+.vscode/
+.idea/
+
+# Byte-compiled / compiled files
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+
+# Pipenv
+Pipfile.lock
+
+# Pytest
+.cache
+.pytest_cache/
