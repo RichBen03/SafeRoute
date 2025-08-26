@@ -29,12 +29,39 @@ SafeRoute API bridges that gap by integrating real-time location lookups, mappin
 - **Scalable Architecture** – Separation of concerns with multiple apps.
 - **API Documentation** – DRF browsable API & Postman Collection.
 
-saferoute/
-├── saferoute/           # Main project settings
-├── users/               # Handles user authentication & profiles
-├── services/            # External API integrations
-├── routes/              # Core routing logic & feedback
+saferoute/               # Main Django project folder
+│
+├── users/               # App 1: User management
+│   ├── models.py        # User, Token
+│   ├── views.py         # Register, Login, Logout, Profile
+│   ├── serializers.py
+│   └── urls.py
+│
+├── services/            # App 2: Emergency services
+│   ├── models.py        # Service
+│   ├── views.py         # CRUD for services
+│   ├── serializers.py
+│   └── urls.py
+│
+├── search/              # App 3: Search & history
+│   ├── models.py        # SearchHistory, SearchResult
+│   ├── views.py         # Search endpoint
+│   ├── serializers.py
+│   └── urls.py
+│
+├── routes/              # App 4: Route safety analysis
+│   ├── models.py        # Route, RouteService
+│   ├── views.py         # Route endpoint
+│   ├── serializers.py
+│   └── urls.py
+│
+├── saferoute/           # Django project settings
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+│
 └── manage.py
+
 
 
 ---
@@ -50,70 +77,190 @@ saferoute/
 
 ---
 
-## 📂 Models
+## 📦 Models
 
-### User
-| Field        | Type    | Notes |
-|--------------|---------|-------|
-| username     | String  | Unique, required |
-| email        | Email   | Unique, required |
-| password     | String  | Hashed |
-| saved_locations | JSON | List of saved coordinates |
+The SafeRoute API uses Django ORM models to represent users, services, and search history.  
+Below is an overview of the key models and their relationships.
 
-### ServiceCategory
-| Field  | Type  | Notes |
-|--------|-------|-------|
-| name   | String| Hospital, Police, Fire Station |
+---
 
-### ServiceLocation
-| Field        | Type   | Notes |
-|--------------|--------|-------|
-| name         | String | Service name |
-| latitude     | Float  | Required |
-| longitude    | Float  | Required |
-| category     | FK     | ServiceCategory |
+### 👤 User
+Represents the system users (both citizens and admins).
+
+| Field                | Type      | Description                           |
+|----------------------|-----------|---------------------------------------|
+| `id`                 | Integer   | Primary key                           |
+| `name`               | String    | Full name of the user                 |
+| `email`              | String    | Unique email address (used for login) |
+| `password`           | String    | Hashed password                       |
+| `role`               | Enum      | `user` (default) or `admin`           |
+| `location_preference`| String    | Optional saved location preference     |
+| `created_at`         | DateTime  | When the account was created          |
+| `updated_at`         | DateTime  | Last account update                   |
+
+---
+
+### 🏥 Service
+Represents an emergency service (hospital, pharmacy, police station, etc.).
+
+| Field        | Type    | Description                              |
+|--------------|---------|------------------------------------------|
+| `id`         | Integer | Primary key                              |
+| `name`       | String  | Service name (e.g., "City Hospital")     |
+| `type`       | Enum    | `hospital`, `pharmacy`, `police`, `fire_station` |
+| `address`    | String  | Service address                          |
+| `latitude`   | Float   | GPS latitude                             |
+| `longitude`  | Float   | GPS longitude                            |
+| `contact`    | String  | Optional phone/email contact info        |
+| `created_at` | DateTime| When the service was added               |
+| `updated_at` | DateTime| Last service update                      |
+
+---
+
+### 🔍 SearchHistory
+Stores past search queries made by users.
+
+| Field         | Type    | Description                              |
+|---------------|---------|------------------------------------------|
+| `id`          | Integer | Primary key                              |
+| `user_id`     | FK → User | User who performed the search          |
+| `query`       | String  | Address or GPS coordinates searched      |
+| `service_type`| Enum    | Optional filter (`hospital`, etc.)       |
+| `results_count`| Int    | Number of results found                  |
+| `created_at`  | DateTime| When the search was performed            |
+
+---
+
+### 📑 SearchResult
+Links a search query with the services returned.
+
+| Field         | Type    | Description                              |
+|---------------|---------|------------------------------------------|
+| `id`          | Integer | Primary key                              |
+| `search_id`   | FK → SearchHistory | Search that generated the result |
+| `service_id`  | FK → Service | Service included in the results     |
+| `relevance_score` | Float | Ranking score (optional)               |
+| `created_at`  | DateTime| When the result was stored               |
+
+---
+
+### 🔑 Token
+Stores JWT refresh tokens for authentication.
+
+| Field        | Type    | Description                              |
+|--------------|---------|------------------------------------------|
+| `id`         | Integer | Primary key                              |
+| `user_id`    | FK → User | Owner of the token                     |
+| `token`      | String  | JWT refresh token                        |
+| `created_at` | DateTime| When the token was created               |
+| `expires_at` | DateTime| When the token expires                   |
+
+---
+
+### 🔗 Relationships
+- **User → SearchHistory** (1-to-many)  
+- **SearchHistory → SearchResult** (1-to-many)  
+- **Service → SearchResult** (1-to-many)  
+- **User → Tokens** (1-to-many)  
+
 
 ---
 
 ## 🗺 ERD Diagram
 
-*(Insert ERD image here once created with Lucidchart/Draw.io)*
+![SafeRoute ERD](Saferoute-ERD.png)
 
 ---
 
 ## 📡 API Endpoints
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET    | `/api/services/` | List all service categories | ❌ |
-| GET    | `/api/services/nearby/?lat=...&lon=...` | Get nearby safety services | ❌ |
-| GET    | `/api/routes/safe/?from=...&to=...` | Get safe route with nearby services | ❌ |
-| POST   | `/api/users/register/` | Create new user | ❌ |
-| POST   | `/api/users/login/` | Get auth token | ❌ |
-| GET    | `/api/users/profile/` | View user profile | ✅ |
-| PUT    | `/api/users/profile/` | Update user profile | ✅ |
+## 🔑 Authentication
+Most endpoints require authentication using **JWT tokens**.  
+- Obtain a token via `/api/users/login/`.  
+- Include it in requests:  
+  ```http
+  Authorization: Bearer <your_token>
+  ```
 
 ---
 
-## 🧾 Example API Call
+## 👤 Users Endpoints
+Manage user accounts, authentication, and profiles.
 
-**Request:**
-```bash
-GET /api/services/nearby/?lat=-1.286389&lon=36.817223&category=hospital
-```
+| Method | Endpoint               | Description                          | Auth Required |
+|--------|------------------------|--------------------------------------|---------------|
+| POST   | `/api/users/register/` | Register a new user                  | ❌ |
+| POST   | `/api/users/login/`    | Login and obtain JWT token           | ❌ |
+| POST   | `/api/users/logout/`   | Logout (invalidate token)            | ✅ |
+| GET    | `/api/users/profile/`  | Retrieve logged-in user profile      | ✅ |
+| PUT    | `/api/users/profile/`  | Update user profile                  | ✅ |
+| GET    | `/api/users/`          | List all users (admin only)          | ✅ (Admin) |
+| DELETE | `/api/users/{id}/`     | Delete a user (admin only)           | ✅ (Admin) |
 
-**Response:**
+---
+
+## 🏥 Services Endpoints
+Manage and retrieve emergency services (hospitals, pharmacies, police, fire stations).
+
+| Method | Endpoint                  | Description                         | Auth Required |
+|--------|---------------------------|-------------------------------------|---------------|
+| GET    | `/api/services/`          | List all services (filter by `type`) | ✅ |
+| GET    | `/api/services/{id}/`     | Retrieve details of a service        | ✅ |
+| POST   | `/api/services/`          | Add a new service (admin only)       | ✅ (Admin) |
+| PUT    | `/api/services/{id}/`     | Update service info (admin only)     | ✅ (Admin) |
+| DELETE | `/api/services/{id}/`     | Delete service (admin only)          | ✅ (Admin) |
+
+---
+
+## 🔍 Search Endpoints
+Search for nearby emergency services and manage search history.
+
+| Method | Endpoint                       | Description                         | Auth Required |
+|--------|--------------------------------|-------------------------------------|---------------|
+| POST   | `/api/search/`                 | Search services by location & type  | ✅ |
+| GET    | `/api/search/history/`         | Retrieve logged-in user search history | ✅ |
+| DELETE | `/api/search/history/{id}/`    | Delete a specific search history entry | ✅ |
+
+---
+
+## 🛣 Routes Endpoints
+Perform **Route Safety Analysis** using OpenStreetMap (ORS).  
+
+| Method | Endpoint              | Description                           | Auth Required |
+|--------|-----------------------|---------------------------------------|---------------|
+| POST   | `/api/routes/`        | Create a safe route (origin → destination) with nearby services | ✅ |
+| GET    | `/api/routes/`        | List routes created by logged-in user | ✅ |
+| GET    | `/api/routes/{id}/`   | Retrieve a specific saved route       | ✅ |
+| DELETE | `/api/routes/{id}/`   | Delete a saved route                  | ✅ |
+
+Example Response for `/api/routes/`:
 ```json
-[
-  {
-    "name": "Kenyatta National Hospital",
-    "latitude": -1.3000,
-    "longitude": 36.8000,
-    "category": "hospital",
-    "distance_km": 2.5
-  }
-]
+{
+  "route": [[-1.2921, 36.8219], [-1.3000, 36.8300]],
+  "nearby_services": [
+    {"id": 1, "name": "Nairobi Hospital", "type": "hospital"},
+    {"id": 5, "name": "Central Police Station", "type": "police"}
+  ]
+}
 ```
+
+---
+
+## 📖 API Documentation
+Interactive API docs are available via **Swagger**:
+
+| Method | Endpoint      | Description |
+|--------|---------------|-------------|
+| GET    | `/api/docs/`  | Swagger UI / ReDoc API documentation |
+
+---
+
+## ✅ Summary
+- **Users App** → Registration, login, profiles, admin user management  
+- **Services App** → Emergency services CRUD & filtering  
+- **Search App** → Nearby service search + history  
+- **Routes App** → Safe routes with emergency services along the path  
+
+Total: **15 endpoints** (core + admin).  
 
 ---
 
