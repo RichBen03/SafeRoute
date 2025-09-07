@@ -1,0 +1,73 @@
+[
+    {
+      "model": "services.service",
+      "pk": 1,
+      "fields": {
+        "name": "Central Police Station",
+        "type": "police",
+        "address": "123 Main St, Nairobi",
+        "latitude": -1.286389,
+        "longitude": 36.817223,
+        "contact_number": "+254700123456",
+        "rating": 4.5,
+        "created_at": "2024-09-01T10:00:00Z"
+      }
+    },
+    {
+      "model": "services.service",
+      "pk": 2,
+      "fields": {
+        "name": "Kenyatta National Hospital",
+        "type": "hospital",
+        "address": "Hospital Rd, Nairobi",
+        "latitude": -1.300000,
+        "longitude": 36.800000,
+        "contact_number": "+254711234567",
+        "rating": 4.8,
+        "created_at": "2024-09-02T12:00:00Z"
+      }
+    },
+    {
+      "model": "services.service",
+      "pk": 3,
+      "fields": {
+        "name": "Westlands Fire Station",
+        "type": "fire",
+        "address": "Westlands, Nairobi",
+        "latitude": -1.265000,
+        "longitude": 36.805000,
+        "contact_number": "+254722345678",
+        "rating": 4.2,
+        "created_at": "2024-09-03T09:30:00Z"
+      }
+    },
+    {
+      "model": "services.service",
+      "pk": 4,
+      "fields": {
+        "name": "24/7 City Pharmacy",
+        "type": "pharmacy",
+        "address": "Moi Avenue, Nairobi",
+        "latitude": -1.283333,
+        "longitude": 36.821944,
+        "contact_number": "+254733456789",
+        "rating": 4.6,
+        "created_at": "2024-09-04T14:45:00Z"
+      }
+    },
+    {
+      "model": "services.service",
+      "pk": 5,
+      "fields": {
+        "name": "Nairobi Primary School",
+        "type": "school",
+        "address": "Ngara Rd, Nairobi",
+        "latitude": -1.282000,
+        "longitude": 36.823000,
+        "contact_number": "+254744567890",
+        "rating": 4.0,
+        "created_at": "2024-09-05T08:15:00Z"
+      }
+    }
+  ]
+  
