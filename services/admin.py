@@ -4,8 +4,7 @@ from .models import Service
 # Register your models here.
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "type", "address", "lat", "lng", "contact_info", "created_at")
+    list_display = ("name", "type", "address", "latitude", "longitude", "contact_number", "created_at")
     list_filter = ("type", "created_at")
-    search_fields = ("name", "address", "contact_info")
+    search_fields = ("name", "address", "contact_number")
     ordering = ("-created_at",)
-    readonly_fields = ("created_at",)
