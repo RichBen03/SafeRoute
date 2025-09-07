@@ -16,6 +16,7 @@ from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
 load_dotenv()
+from drf_yasg import openapi
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -47,6 +48,17 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'description': 'JWT authorization using Bearer scheme. Example: "Bearer {token}"',
+            'name': 'Authorization',
+            'in': 'header',
+        }
+    }
 }
 
 
